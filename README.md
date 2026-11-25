@@ -80,9 +80,9 @@ For sites returning `401`/`403` due to `HttpOnly` session cookies, right-click t
 
 ---
 
-## ☁️ Global Zero-Quota Hosting
+## ☁️ Contributions and testing
 
-Host your own public instance on **Cloudflare Pages** with **0 shared database** and **0 host Workers quota consumed** (see `DEPLOY_GLOBAL.md`):
+Host your own public instance on **Cloudflare Pages** with **0 shared database** and **0 host Workers quota consumed** (see [`ARCHITECTURE.md`](./ARCHITECTURE.md) for technical details):
 
 ```bash
 npm run build:pages
