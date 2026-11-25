@@ -11,7 +11,7 @@ import { BUNDLED_RUSHER } from "@/lib/types";
 export const RUSHER: Adapter = BUNDLED_RUSHER;
 
 function initialDB(): StudioDB {
-  return { version: 1, settings: { localApiKey: "" }, adapters: [structuredClone(RUSHER)], logs: [] };
+  return { version: 1, settings: { localApiKey: "" }, adapters: [], logs: [] };
 }
 
 async function ensureFile() {

@@ -300,7 +300,7 @@ export default function Studio({
   const modelCount = active.reduce((count, adapter) => count + adapter.models.length, 0);
   const firstModel = active[0]?.models[0]
     ? `${active[0].id}/${active[0].models[0].id}`
-    : "rusherai/gpt-6-astra";
+    : "your-site/model";
   const displayBase =
     mode === "global"
       ? personalGatewayUrl
@@ -1130,25 +1130,6 @@ export default function Studio({
                           <CircleAlert size={15} />
                         )}
                         <span>{notice.text}</span>
-                        {notice.kind === "error" &&
-                          tab === "discover" &&
-                          captureSession &&
-                          !captureOpen && (
-                            <button type="button" onClick={() => setCaptureOpen(true)}>
-                              Open live capture →
-                            </button>
-                          )}
-                        {notice.kind === "error" && tab === "discover" && !captureSession && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTab("import");
-                              setNotice(null);
-                            }}
-                          >
-                            Paste request instead →
-                          </button>
-                        )}
                       </div>
                     )}
                     {report && (
@@ -1615,10 +1596,10 @@ export default function Studio({
                       type="button"
                       className="button button-outline"
                       onClick={() => {
-                        if (window.confirm("Reset browser adapters back to the default RusherAI starter?")) {
+                        if (window.confirm("Reset browser adapters back to empty defaults?")) {
                           resetBrowserAdapters();
                           syncBrowserState();
-                          setNotice({ kind: "success", text: "Reset browser storage to the bundled RusherAI adapter." });
+                          setNotice({ kind: "success", text: "Cleared browser adapters and reset to defaults." });
                         }
                       }}
                     >
@@ -1772,7 +1753,7 @@ export default function Studio({
                     <div>
                       <strong>Auto-discover or Live Capture any AI chat</strong>
                       <p>
-                        RusherAI is pre-loaded. Paste any website URL: if static discovery can&apos;t
+                        Paste any website URL: if static discovery can&apos;t
                         verify it, Live Browser Capture opens automatically with a Console snippet
                         &amp; draggable Bookmarklet hooking <code>fetch</code>, <code>XHR</code>,{" "}
                         <code>EventSource</code>, <code>WebSocket</code>, and same-origin iframes.

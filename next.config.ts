@@ -6,7 +6,14 @@ const nextConfig: NextConfig = isStaticExport
   ? {
       output: "export",
       images: { unoptimized: true },
+      experimental: {
+        agentUpgrade: "security",
+      },
     }
-  : {};
+  : {
+      experimental: {
+        agentUpgrade: "security",
+      },
+    };
 
 export default nextConfig;

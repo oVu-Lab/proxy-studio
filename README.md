@@ -75,8 +75,6 @@ If static discovery fails (auth-gated, Cloudflare-protected, or obfuscated sites
 3. **Tier 3 — Paste cURL / fetch (For `HttpOnly` Cookies)**
 For sites returning `401`/`403` due to `HttpOnly` session cookies, right-click the chat request in DevTools Network → **Copy as cURL** (or **Copy as fetch**) and paste it in. Pasted text is strictly parsed, never executed.
 
-> 💡 **Pre-configured Demo:** Includes a bundled **RusherAI** adapter (`https://allaitools-generate.freemodels.workers.dev/api/chat`) so you can test streaming immediately out of the box. *(Upstream availability and model labels are controlled by the third-party site.)*
-
 ---
 
 ## ☁️ Contributions and testing
@@ -125,7 +123,7 @@ Point **Magpie**, **Cherry Studio**, or any **OpenAI SDK** to `http://localhost:
 curl http://localhost:8088/v1/chat/completions \
   -H 'Content-Type: application/json' \
   -d '{
-    "model": "rusherai/gpt-6-astra",
+    "model": "your-site/model",
     "messages": [{"role": "user", "content": "Hello!"}],
     "stream": true
   }'
@@ -139,7 +137,7 @@ from openai import OpenAI
 
 client = OpenAI(base_url="http://localhost:8088/v1", api_key="not-needed")
 reply = client.chat.completions.create(
-    model="rusherai/gpt-6-astra",
+    model="your-site/model",
     messages=[{"role": "user", "content": "Hello!"}],
 )
 print(reply.choices[0].message.content)

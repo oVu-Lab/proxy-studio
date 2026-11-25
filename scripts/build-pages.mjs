@@ -23,14 +23,13 @@ const pageFile = path.join(appDir, "page.tsx");
 const origPageBackup = path.join(stash, "page.tsx.bak");
 
 const STATIC_PAGE = `import Studio from "@/components/Studio";
-import { BUNDLED_RUSHER, publicAdapter } from "@/lib/types";
 
 export default function Home() {
   return (
     <Studio
       staticOnly
       initial={{
-        adapters: [publicAdapter(BUNDLED_RUSHER)],
+        adapters: [],
         logs: [],
         authRequired: false,
         envKey: false,

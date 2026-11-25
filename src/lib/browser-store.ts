@@ -2,7 +2,6 @@ import { analyzeCapture, parseManualCaptureInput } from "@/lib/capture-analyzer"
 import { buildCaptureArtifacts } from "@/lib/capture-script";
 import { extractText } from "@/lib/response-parser";
 import {
-  BUNDLED_RUSHER,
   publicAdapter,
   type Adapter,
   type CaptureAnalysis,
@@ -75,18 +74,18 @@ export function saveModePreference(mode: "auto" | "local" | "global") {
 }
 
 export function loadBrowserAdapters(): Adapter[] {
-  if (typeof window === "undefined") return [structuredClone(BUNDLED_RUSHER)];
+  if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(KEYS.adapters);
     if (!raw) {
-      const seed = [structuredClone(BUNDLED_RUSHER)];
+      const seed: Adapter[] = [];
       safeWrite(KEYS.adapters, seed);
       return seed;
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) return parsed as Adapter[];
-  } catch { /* fallback to bundled seed */ }
-  const seed = [structuredClone(BUNDLED_RUSHER)];
+  } catch { /* fallback to empty seed */ }
+  const seed: Adapter[] = [];
   safeWrite(KEYS.adapters, seed);
   return seed;
 }
@@ -96,7 +95,7 @@ export function saveBrowserAdapters(adapters: Adapter[]) {
 }
 
 export function resetBrowserAdapters(): Adapter[] {
-  const seed = [structuredClone(BUNDLED_RUSHER)];
+  const seed: Adapter[] = [];
   saveBrowserAdapters(seed);
   return seed;
 }
