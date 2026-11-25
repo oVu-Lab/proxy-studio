@@ -53,7 +53,7 @@ flowchart LR
     L --> U
     E1 --> U
     E2 --> U
-
+```
 ---
 
 ## 🚀 Quick Start
