@@ -168,3 +168,7 @@ print(reply.choices[0].message.content)
 * **Third-Party Terms of Service:** Connecting to or proxying requests to third-party AI websites may violate their Terms of Service (ToS) or Acceptable Use Policies. You are solely responsible for reviewing and complying with the terms, rate limits, and applicable laws of any service you connect to.
 * **No Affiliation:** Proxy Studio is an independent open-source project and is **not affiliated with, endorsed by, or sponsored by** OpenAI, Cloudflare, or any third-party AI chat providers (including any bundled example templates).
 * **No Warranty & Limitation of Liability:** This software is provided **"AS IS"**, without warranty of any kind, express or implied. The authors and contributors assume no liability for any account suspensions, IP bans, service disruptions, data loss, or damages arising from the use or misuse of this tool.
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [`LICENSE`](./LICENSE) file for details.
