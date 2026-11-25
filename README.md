@@ -66,11 +66,10 @@ Proxy Studio uses a resilient **3-tier fallback pipeline** so minor site variati
 1. **Tier 1 — Auto-Discover (Static Scan)**
 Paste any AI chat URL. Proxy Studio fetches the HTML and public JS/CSS bundles, heuristically extracts candidate endpoints, models, and headers, and runs a safe live probe to verify connectivity.
 2. **Tier 2 — Live Browser Capture (Automatic Fallback)**
-If static discovery fails (auth-gated, Cloudflare-protected, or obfuscated sites), Proxy Studio launches a live capture session with a **Console snippet** and **draggable Bookmarklet**:
-* Hooks `fetch`, `XMLHttpRequest`, `EventSource`, and **`WebSocket`** non-destructively.
-* Auto-hooks same-origin `<iframe>`s and prints a bright warning if cross-origin `<iframe>`s are detected (guiding you to switch the DevTools `top` dropdown).
-* Handles JSON, `text/plain`, `FormData`, `URLSearchParams`, `GET` params, and WS frames.
-* **CSP Fallback**: If the target site blocks auto-POSTing to `localhost:8088`, captures are saved to `window.__proxyCapture.last` — simply run `copy(__proxyCapture.last)` in Console and paste into the **Manual Paste Fallback** box.
+If static discovery fails (auth-gated, Cloudflare-protected, or obfuscated sites), Proxy Studio launches a live capture session with a **Console snippet** and **draggable Bookmarklet**:               * Hooks `fetch`, `XMLHttpRequest`, `EventSource`, and **`WebSocket`** non-destructively.
+   * Auto-hooks same-origin `<iframe>`s and prints a bright warning if cross-origin `<iframe>`s are     detected (guiding you to switch the DevTools `top` dropdown).
+   * Handles JSON, `text/plain`, `FormData`, `URLSearchParams`, `GET` params, and WS frames.
+   * **CSP Fallback**: If the target site blocks auto-POSTing to `localhost:8088`, captures are         saved to `window.__proxyCapture.last` — simply run `copy(__proxyCapture.last)` in Console and        paste into the **Manual Paste Fallback** box.
 
 
 3. **Tier 3 — Paste cURL / fetch (For `HttpOnly` Cookies)**
