@@ -1,86 +1,183 @@
-# Proxy Studio
+<div align="center">
 
-A local-first studio for connecting supported AI chat websites to OpenAI-compatible clients. Adapters, settings, and the last 200 request-metadata entries are saved in `./data/db.json`. There is no database service, container, account, or migration to set up.
+# ⚡ Proxy Studio
 
-## Start
+**Connect any AI chat website to OpenAI-compatible clients — locally or globally with zero database & zero host quota.**
 
-Requires **Node.js 20.9 or later** and npm.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-proxy--studio.pages.dev-2ea44f?style=for-the-badge&logo=cloudflarepages&logoColor=white)](https://proxy-studio.pages.dev)
+[![Node.js](https://img.shields.io/badge/Node.js-20.9%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Zero DB](https://img.shields.io/badge/Database-None_(JSON_%2F_localStorage)-blue?style=for-the-badge)](#)
+[![OpenAI Compatible](https://img.shields.io/badge/API-OpenAI_Compatible-412991?style=for-the-badge&logo=openai&logoColor=white)](#openai-compatible-gateway)
+
+[🌐 Try Global Demo](https://proxy-studio.pages.dev) · [🚀 Quick Start](#-quick-start) · [🔌 Connect a Site](#-how-site-discovery-works) · [☁️ Zero-Quota Hosting](#-global-zero-quota-hosting) · [📡 API Reference](#-openai-compatible-gateway)
+
+</div>
+
+---
+
+## ✨ Why Proxy Studio?
+
+| Feature | Description |
+| :--- | :--- |
+| 🏠 **Local-First & Zero DB** | Everything (adapters, settings, last 200 logs) lives in `./data/db.json`. No Postgres, Docker, or migrations required. |
+| 🌍 **Global Zero-Quota Mode** | Host publicly on **Cloudflare Pages** (unlimited static requests). Each user's data stays privately in their own browser `localStorage`. |
+| 🔍 **3-Tier Site Discovery** | Automatically falls back from **Static Bundle Scan** → **Live Browser Capture** → **cURL / fetch Paste**. |
+| 📦 **1-Click Gateway Export** | Export a personal **Cloudflare Worker** (`worker.js`) or zero-dependency **Local Companion** (`proxy.mjs`) in one click. |
+| 🧠 **Smart Suffix Routing** | Append `-think`, `-search`, or `-think-search` to any supported model ID to toggle reasoning & web search without changing client settings. |
+
+---
+
+## 🗺️ Architecture
+
+```mermaid
+flowchart LR
+    C1["Magpie / Cherry Studio / OpenAI SDK"]
+
+    subgraph Local["Local Mode"]
+        L["Local Server<br/>localhost:8088 + data/db.json"]
+    end
+
+    subgraph Global["Global Mode (Cloudflare Pages)"]
+        G["Browser localStorage<br/>100% Isolated"]
+        E1["User's Own Cloudflare Worker<br/>User's 100k/day free tier"]
+        E2["Local Companion<br/>proxy.mjs on 127.0.0.1:8088"]
+    end
+
+    U["Target AI Chat Websites"]
+
+    C1 --> L
+    G -->|1-Click Export| E1
+    G -->|1-Click Export| E2
+    C1 --> E1
+    C1 --> E2
+    L --> U
+    E1 --> U
+    E2 --> U
+
+---
+
+## 🚀 Quick Start
+
+### Option 1: Use Online (Zero Install)
+
+Open **[proxy-studio.pages.dev](https://proxy-studio.pages.dev)** directly in your browser. Capture any site, then click **Export Gateway** to deploy your own free Cloudflare Worker or download a zero-dependency local proxy.
+
+### Option 2: Run Locally on macOS / Windows / Linux
+
+Requires **Node.js 20.9+** and `npm`.
 
 ```bash
 npm install
 npm start
+
 ```
 
-Open **http://localhost:8088**. The first `npm start` automatically builds the app; subsequent starts use that build. To rebuild after changing source, run `npm run build`.
+Open **[http://localhost:8088](http://localhost:8088)** in your browser.
 
-On macOS, double-click `start-mac.command`. It installs dependencies on first launch, starts the app, and opens the browser. You may need to allow the file under macOS Privacy & Security the first time. Keep the terminal window open while using the studio.
+* **macOS 1-Click**: Double-click `start-mac.command` to auto-install dependencies, start the server, and open the UI.
+* **Custom Port**: Run `PORT=9000 npm start` (binds to `127.0.0.1` by default).
+* **Rebuild**: The first `npm start` builds automatically; run `npm run build` after modifying source code.
 
-The server binds to `127.0.0.1` by default. Change the port with `PORT=9000 npm start`. You can explicitly set `HOST=0.0.0.0`, but doing so exposes the **unauthenticated management interface** to your network; do not expose it to untrusted users. The optional gateway key does not protect the management interface.
+> ⚠️ **Security Note:** Setting `HOST=0.0.0.0` exposes the unauthenticated management dashboard to your network. Keep it bound to `127.0.0.1` unless protected behind your own auth layer.
 
-## Connect a site
+---
 
-1. Paste a website URL into **Auto-discover**. The server reads the HTML and linked public JS/CSS files with bounded HTTP GET requests. It heuristically searches for likely endpoints, models, and request fields.
-2. It sends a short live chat request to a small number of candidate endpoints using an Origin and Referer derived from the website URL. A verified adapter is saved only when a recognizable JSON or streaming response is received. This test can consume the site's resources or quota.
-3. If static discovery cannot find or verify an endpoint (e.g. auth-gated, Cloudflare-protected, or obfuscated/dynamic sites), Proxy Studio **automatically starts a Live Browser Capture session** (`GET /api/capture/session/:id`, polled every 2 seconds) and provides both:
-   - a **one-click copyable DevTools Console snippet**, and
-   - a **draggable Bookmarklet** (`javascript:...`) for your browser's bookmarks bar.
-   
-   Running either on the target site attaches non-destructive hooks on `fetch`, `XMLHttpRequest`, `EventSource`, **and `WebSocket`**, auto-hooks accessible same-origin `<iframe>`s, prints a bright yellow warning if cross-origin `<iframe>`s exist (guiding you to switch the DevTools Console `top` dropdown), supports `application/json`, `text/plain` JSON strings, `FormData`, `URLSearchParams`, `GET` query params, and WS frames, filters static assets and analytics/Firestore telemetry without over-filtering unusual APIs, and automatically POSTs captures to `http://localhost:8088/api/capture/ingest?sessionId=...` (with `Access-Control-Allow-Origin: *` and `Access-Control-Allow-Private-Network: true`). If a site's Content-Security-Policy (CSP) or mixed-content rules block auto-send, the script saves captures into `window.__proxyCapture.last` (and `.all`) and prints an instant fix (`copy(__proxyCapture.last)`) to paste straight into the **Manual Paste Fallback** box inside the Capture Modal. All errors are translated into plain-English guidance with exact next actions.
-4. For sites using `HttpOnly` login cookies (401/403), paste DevTools **Copy as cURL** or **Copy as fetch** into either the **Manual Paste Fallback** tab inside the Capture Modal or the main **Paste cURL / JSON** tab. All pasted text is parsed — never executed.
+## 🔌 How Site Discovery Works
 
-## Global Zero-Quota Hosting (Cloudflare Pages)
+Proxy Studio uses a resilient **3-tier fallback pipeline** so minor site variations don't break your workflow:
 
-Deploy Proxy Studio publicly with **zero shared database** and **0 host Workers quota consumed** — see [`DEPLOY_GLOBAL.md`](./DEPLOY_GLOBAL.md):
+1. **Tier 1 — Auto-Discover (Static Scan)**
+Paste any AI chat URL. Proxy Studio fetches the HTML and public JS/CSS bundles, heuristically extracts candidate endpoints, models, and headers, and runs a safe live probe to verify connectivity.
+2. **Tier 2 — Live Browser Capture (Automatic Fallback)**
+If static discovery fails (auth-gated, Cloudflare-protected, or obfuscated sites), Proxy Studio launches a live capture session with a **Console snippet** and **draggable Bookmarklet**:
+* Hooks `fetch`, `XMLHttpRequest`, `EventSource`, and **`WebSocket`** non-destructively.
+* Auto-hooks same-origin `<iframe>`s and prints a bright warning if cross-origin `<iframe>`s are detected (guiding you to switch the DevTools `top` dropdown).
+* Handles JSON, `text/plain`, `FormData`, `URLSearchParams`, `GET` params, and WS frames.
+* **CSP Fallback**: If the target site blocks auto-POSTing to `localhost:8088`, captures are saved to `window.__proxyCapture.last` — simply run `copy(__proxyCapture.last)` in Console and paste into the **Manual Paste Fallback** box.
+
+
+3. **Tier 3 — Paste cURL / fetch (For `HttpOnly` Cookies)**
+For sites returning `401`/`403` due to `HttpOnly` session cookies, right-click the chat request in DevTools Network → **Copy as cURL** (or **Copy as fetch**) and paste it in. Pasted text is strictly parsed, never executed.
+
+> 💡 **Pre-configured Demo:** Includes a bundled **RusherAI** adapter (`https://allaitools-generate.freemodels.workers.dev/api/chat`) so you can test streaming immediately out of the box. *(Upstream availability and model labels are controlled by the third-party site.)*
+
+---
+
+## ☁️ Global Zero-Quota Hosting
+
+Host your own public instance on **Cloudflare Pages** with **0 shared database** and **0 host Workers quota consumed** (see `DEPLOY_GLOBAL.md`):
 
 ```bash
 npm run build:pages
 npx wrangler pages deploy out --project-name=proxy-studio
+
 ```
 
-In Global Mode, each visitor's adapters, headers, logs, and Playground history stay privately inside their own browser's `localStorage`. Every user gets 1-click **Export Gateway** options:
-- **Personal Cloudflare Worker** (`worker.js` + `wrangler.toml`) — runs on *their own* free 100,000 req/day quota.
-- **Zero-dependency Local Companion** (`proxy.mjs` + `start-mac.command` + `start-windows.bat`) — zero `npm install`, listens on `http://127.0.0.1:8088/v1` for Magpie, Cherry Studio, and OpenAI SDKs.
+Every visitor gets:
 
-Discovery is heuristic, not guaranteed to work with every site. It cannot obtain login sessions, solve challenges, execute obfuscated code, or predict changing tokens. The importer supports JSON requests containing a `messages` array; unsupported request shapes, tool calls, images, and dynamic JavaScript variables are not silently converted. Imported session credentials may expire and must be updated by the user.
+* **Private Browser Storage**: Adapters, headers, and Playground history never leave their browser.
+* **Personal Cloudflare Worker Export**: Ready-to-deploy `worker.js` + `wrangler.toml` running on *their own* free 100,000 req/day quota.
+* **Local Companion Export**: Zero-dependency `proxy.mjs` + `start-mac.command` + `start-windows.bat` (no `npm install` needed).
 
-The bundled **RusherAI** adapter is preconfigured for `https://allaitools-generate.freemodels.workers.dev/api/chat` with `Origin: https://rusherai.com`. The endpoint and model list may change or stop working. Model names are upstream labels and do not guarantee the identity of the actual provider/model.
+---
 
-## OpenAI-compatible gateway
+## 📡 OpenAI-Compatible Gateway
 
-Use **http://localhost:8088/v1** as the base URL in Magpie, Cherry Studio, or an OpenAI-compatible SDK. If no local API key is configured, use any placeholder when a client requires one.
+Point **Magpie**, **Cherry Studio**, or any **OpenAI SDK** to `http://localhost:8088/v1` (or your exported Worker URL).
 
-- `GET /v1/models` lists models from enabled adapters using `adapter-id/model-id` names.
-- `POST /v1/chat/completions` accepts text-only chat messages and supports JSON or SSE (`stream: true`).
-- `GET /proxy/:adapterId/v1/models` and `POST /proxy/:adapterId/v1/chat/completions` isolate one adapter; its model IDs are unprefixed.
-- Where the upstream has corresponding flags, append `-think`, `-search`, or `-think-search` to the model ID. These variants are listed by `/v1/models`.
-- CORS is enabled on gateway endpoints. There is no automatic forwarding of arbitrary OpenAI options; the imported upstream request template controls what the site supports.
+### Endpoints
 
-Example:
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/v1/models` | Lists all enabled models (`adapter-id/model-id`) including suffix variants. |
+| `POST` | `/v1/chat/completions` | Chat completions supporting both JSON and SSE streaming (`stream: true`). |
+| `GET` | `/proxy/:adapterId/v1/models` | Isolated model list for a single adapter (unprefixed IDs). |
+| `POST` | `/proxy/:adapterId/v1/chat/completions` | Isolated chat endpoint for a single adapter. |
+
+### Model Suffix Routing
+
+| Suffix | Thinking / Reasoning | Web / Deep Search |
+| --- | --- | --- |
+| *(none)* | Off | Off |
+| `-think` | ✅ On | Off |
+| `-search` | Off | ✅ On |
+| `-think-search` | ✅ On | ✅ On |
+
+#### cURL
 
 ```bash
 curl http://localhost:8088/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"rusherai/gpt-6-astra","messages":[{"role":"user","content":"Hello!"}],"stream":true}'
+  -d '{
+    "model": "rusherai/gpt-6-astra",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": true
+  }'
+
 ```
 
-In Python:
+#### Python (OpenAI SDK)
 
 ```python
 from openai import OpenAI
+
 client = OpenAI(base_url="http://localhost:8088/v1", api_key="not-needed")
 reply = client.chat.completions.create(
     model="rusherai/gpt-6-astra",
     messages=[{"role": "user", "content": "Hello!"}],
 )
 print(reply.choices[0].message.content)
+
 ```
 
-Configure an optional gateway key under **Settings**, or set `STUDIO_API_KEY` in the server environment. When enabled, send `Authorization: Bearer YOUR_KEY` (or `X-API-Key`). The environment variable takes precedence over the saved key.
+*Optional Auth:* Configure a gateway API key under **Settings** or via the `STUDIO_API_KEY` environment variable (env var takes precedence), then pass `Authorization: Bearer YOUR_KEY` or `X-API-Key`.
 
-## Security and data
+---
 
-- Imported headers, cookies, request templates, and any key saved in Settings are stored **unencrypted** in `data/db.json`. Protect that file and do not share it. Header values are not returned by the dashboard API. Prompts and responses are not stored in the activity log.
-- The management UI has no login. Bind only to loopback unless you provide your own protection. Gateway CORS permits browser clients; set a gateway key if you do not trust other websites on your machine.
-- Private, loopback, and link-local discovery targets are blocked by default to reduce SSRF risk. For trusted local test servers only, start with `STUDIO_ALLOW_PRIVATE_TARGETS=1 npm start`. URL/DNS checks are not a substitute for network isolation.
-- The studio does not bypass upstream authentication, quotas, or terms. Only connect sites and credentials you are authorized to use.
-- If the JSON file is deleted, it is recreated with the bundled adapter on the next request. Back it up before making changes. Do not edit it while the server is running.
+## 🔒 Security & Data Notes
+
+* **Local Storage**: Imported headers, cookies, request templates, and saved keys are stored **unencrypted** in `data/db.json`. Do not commit or share this file. Header values are masked in the dashboard API, and prompts/responses are excluded from activity logs.
+* **Network & SSRF Protection**: Private, loopback, and link-local discovery targets are blocked by default. For trusted local test servers only, start with `STUDIO_ALLOW_PRIVATE_TARGETS=1 npm start`.
+* **CORS**: Enabled on gateway endpoints for browser clients; set a gateway key if you do not trust other websites running on your machine.
+* **Limitations**: Discovery is heuristic and cannot bypass authentication, solve CAPTCHAs, or execute obfuscated code. Only connect sites and credentials you are authorized to use.
+* **Backup**: If `data/db.json` is deleted, it regenerates with the bundled adapter on the next request. Do not edit it while the server is running.
