@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Activity,
   ArrowRight,
-  ArrowUpRight,
   BookOpen,
   Check,
   CheckCircle2,
@@ -41,6 +40,7 @@ import {
 import CaptureModal from "@/components/CaptureModal";
 import ExportPanel from "@/components/ExportPanel";
 import Playground from "@/components/Playground";
+import OverviewHero from "@/components/OverviewHero";
 import {
   appendBrowserLog,
   clearBrowserLogs,
@@ -839,44 +839,26 @@ export default function Studio({
         <main className="main-content">
           {view === "overview" && (
             <>
-              <div className="page-heading">
-                <div>
-                  <div className="heading-kicker">
-                    <span className="kicker-icon">
-                      <Sparkles size={12} />
-                    </span>{" "}
-                    {isGlobal ? "ZERO-QUOTA BROWSER STUDIO" : "YOUR LOCAL AI WORKSPACE"}
-                  </div>
-                  <h1>
-                    All your AI chats. <span>One API.</span>
-                  </h1>
-                  <p>
-                    {isGlobal
-                      ? "Private per-browser capture studio. Discover chat sites, then export your own free Worker or local proxy."
-                      : "Connect chat sites to the tools you already use. Simple, local, yours."}
-                  </p>
-                </div>
-                <div className="heading-actions">
-                  {isGlobal ? (
-                    <button
-                      type="button"
-                      className="button button-dark"
-                      onClick={() => setView("export")}
-                    >
-                      <CloudUpload size={15} /> Export /v1 Gateway <ArrowUpRight size={15} />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="button button-dark"
-                      onClick={() => setView("playground")}
-                    >
-                      <Play size={15} fill="currentColor" /> Open playground{" "}
-                      <ArrowUpRight size={15} />
-                    </button>
-                  )}
-                </div>
-              </div>
+              <OverviewHero
+                isGlobal={isGlobal}
+                url={url}
+                setUrl={setUrl}
+                working={working}
+                onDiscover={() => void discover()}
+                adapterCount={active.length}
+                modelCount={modelCount}
+                notice={notice}
+                showNotice={tab === "discover"}
+                hasBackgroundCapture={Boolean(captureSession && !captureOpen)}
+                onOpenCapture={() => setCaptureOpen(true)}
+                onPasteInstead={() => {
+                  setTab("import");
+                  setNotice(null);
+                  document.getElementById("discover")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                onOpenPlayground={() => setView("playground")}
+                onOpenExport={() => setView("export")}
+              />
 
               <div className="stats-grid">
                 <div className="stat-card">
@@ -1140,7 +1122,7 @@ export default function Studio({
                         </button>
                       </div>
                     )}
-                    {notice && (
+                    {notice && tab !== "discover" && (
                       <div className={`inline-message ${notice.kind}`} role="status">
                         {notice.kind === "success" ? (
                           <CheckCircle2 size={15} />
