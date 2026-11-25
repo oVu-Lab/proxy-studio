@@ -29,46 +29,8 @@
 
 ## 🗺️ Architecture
 
-```mermaid
-flowchart LR
-    C(["💬 Clients<br/>Magpie · Cherry Studio · SDK · Harness"])
+<img width="1376" height="768" alt="watermarked_img_1449946415895773602" src="https://github.com/user-attachments/assets/aa5fd602-8aa6-4404-82b3-13e4dca81ed4" />
 
-    subgraph Local["🖥️ Local Mode (Zero DB)"]
-        L("⚡ Local Server<br/>localhost:8088 + db.json")
-    end
-
-    subgraph Global["🌐 Global Mode (Zero Host Quota)"]
-        G("🧭 Browser Studio<br/>localStorage · 100% Isolated")
-        E1("☁️ User's Own Worker<br/>User's 100k/day Free Tier")
-        E2("💻 Local Companion<br/>proxy.mjs · 127.0.0.1:8088")
-        G -. "1-Click Export" .-> E1
-        G -. "1-Click Export" .-> E2
-    end
-
-    U(["🤖 Target AI Chat Websites"])
-
-    C --> L
-    C --> E1
-    C --> E2
-    L --> U
-    E1 --> U
-    E2 --> U
-
-    classDef client fill:#1e293b,stroke:#38bdf8,stroke-width:2px,color:#f8fafc
-    classDef local fill:#064e3b,stroke:#10b981,stroke-width:2px,color:#ecfdf5
-    classDef studio fill:#312e81,stroke:#818cf8,stroke-width:2px,color:#eef2ff
-    classDef export fill:#1e1b4b,stroke:#a78bfa,stroke-width:1.5px,color:#f5f3ff
-    classDef target fill:#451a03,stroke:#f59e0b,stroke-width:2px,color:#fffbeb
-
-    class C client
-    class L local
-    class G studio
-    class E1,E2 export
-    class U target
-
-    style Local fill:#022c22,stroke:#059669,stroke-dasharray:4 4,color:#a7f3d0
-    style Global fill:#17153b,stroke:#6366f1,stroke-dasharray:4 4,color:#c7d2fe
-```
 ---
 
 ## 🚀 Quick Start
