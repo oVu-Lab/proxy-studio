@@ -31,7 +31,7 @@
 
 ```mermaid
 flowchart LR
-    C(["💬 Clients<br/>Magpie · Cherry Studio · SDK"])
+    C(["💬 Clients<br/>Magpie · Cherry Studio · SDK · Harness"])
 
     subgraph Local["🖥️ Local Mode (Zero DB)"]
         L("⚡ Local Server<br/>localhost:8088 + db.json")
